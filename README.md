@@ -1,5 +1,7 @@
 
-# Clipboard utility for Go
+# Clipboard for Go
+
+Provide copying and pasting to the Clipboard for Go
 
 platform, works on:
 
