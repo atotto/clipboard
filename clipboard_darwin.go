@@ -7,29 +7,34 @@
 package clipboard
 
 import (
-	"log"
 	"os/exec"
 )
 
-func Get() string {
-	cmd := exec.Command("pbpaste")
-	out, err := cmd.Output()
+type Watcher struct {
+	Copied chan string
+}
+
+var (
+	pbpasteCmd = exec.Command("pbpaste")
+	pbcopyCmd  = exec.Command("pbcopy")
+)
+
+func ReadAll() string {
+	out, err := pbpasteCmd.Output()
 	if err != nil {
 		panic(err)
 	}
 	return string(out)
 }
 
-func Set(str string) {
-	cmd := exec.Command("pbcopy")
-	in, err := cmd.StdinPipe()
+func WriteAll(str string) {
+	in, err := pbcopyCmd.StdinPipe()
 	if err != nil {
-		log.Println(err)
-		return
+		panic(err)
 	}
 
-	cmd.Start()
+	pbcopyCmd.Start()
 	in.Write([]byte(str))
 	in.Close()
-	cmd.Wait()
+	pbcopyCmd.Wait()
 }

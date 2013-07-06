@@ -11,8 +11,8 @@ import (
 
 func TestCopyAndPaste(t *testing.T) {
 	expected := "testtest"
-	Set(expected)
-	actual := Get()
+	WriteAll(expected)
+	actual := ReadAll()
 
 	if actual != expected {
 		t.Errorf("want %s, got %s", expected, actual)
