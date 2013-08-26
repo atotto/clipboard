@@ -1,4 +1,3 @@
-
 # Clipboard for Go
 
 Provide copying and pasting to the Clipboard for Go
@@ -10,6 +9,11 @@ platform, works on:
 * OSX
 * Windows 7 (probably work on other Windows)
 
+
+Document: 
+
+* http://godoc.org/github.com/atotto/clipboard
+
 Notes:
 
 * Text string only
@@ -19,7 +23,6 @@ TODO:
 
 * Linux support
 * BSD support
-
 * Clipboard watcher(?)
 
 ## Commands:
