@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/atotto/clipboard"
+
 	"io/ioutil"
 	"os"
 )

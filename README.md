@@ -3,18 +3,43 @@
 
 Provide copying and pasting to the Clipboard for Go
 
+    $ go get github.com/atotto/clipboard
+
 platform, works on:
 
 * OSX
+* Windows 7 (probably work on other Windows)
 
 Notes:
 
 * Text string only
+* UTF-8 text encoding only (no conversion)
 
 TODO:
 
 * Linux support
-* Windows support
 * BSD support
 
-* Clipboard watcher
+* Clipboard watcher(?)
+
+
+
+Commands:
+
+paste command,
+
+    $ go get github.com/atotto/clipboard/cmd/gopaste
+
+like this:
+
+    $ gopaste > document.txt
+
+
+copy command, 
+
+    $ go get github.com/atotto/clipboard/cmd/gocopy
+
+like this:
+
+    $ cat document.txt | gocopy
+

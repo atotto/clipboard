@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build darwin
+// +build linux
 
 package clipboard
 
@@ -11,26 +11,26 @@ import (
 )
 
 var (
-	pbpasteCmd = exec.Command("pbpaste")
-	pbcopyCmd  = exec.Command("pbcopy")
+	pasteCmd = exec.Command("xsel --output --clipboard")
+	copyCmd  = exec.Command("xsel --input --clipboard")
 )
 
 func readAll() string {
-	out, err := pbpasteCmd.Output()
+	out, err := pasteCmd.Output()
 	if err != nil {
 		panic(err)
 	}
 	return string(out)
 }
 
-func writeAll(text string) {
-	in, err := pbcopyCmd.StdinPipe()
+func writeAll(str string) {
+	in, err := copyCmd.StdinPipe()
 	if err != nil {
 		panic(err)
 	}
 
-	pbcopyCmd.Start()
-	in.Write([]byte(text))
+	copyCmd.Start()
+	in.Write([]byte(str))
 	in.Close()
-	pbcopyCmd.Wait()
+	copyCmd.Wait()
 }

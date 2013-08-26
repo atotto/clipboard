@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/atotto/clipboard"
+
+	"fmt"
 )
 
 func main() {
-	fmt.Println(clipboard.ReadAll())
+	fmt.Print(clipboard.ReadAll())
 }
