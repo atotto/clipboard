@@ -11,12 +11,12 @@ import (
 )
 
 var (
-	pbpasteCmd = exec.Command("pbpaste")
-	pbcopyCmd  = exec.Command("pbcopy")
+	pasteCmd = exec.Command("pbpaste")
+	copyCmd  = exec.Command("pbcopy")
 )
 
 func readAll() (string, error) {
-	out, err := pbpasteCmd.Output()
+	out, err := pasteCmd.Output()
 	if err != nil {
 		return "", err
 	}
@@ -24,12 +24,12 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
-	in, err := pbcopyCmd.StdinPipe()
+	in, err := copyCmd.StdinPipe()
 	if err != nil {
 		return err
 	}
 
-	if err := pbcopyCmd.Start(); err != nil {
+	if err := copyCmd.Start(); err != nil {
 		return err
 	}
 	if _, err := in.Write([]byte(text)); err != nil {
@@ -38,5 +38,5 @@ func writeAll(text string) error {
 	if err := in.Close(); err != nil {
 		return err
 	}
-	return pbcopyCmd.Wait()
+	return copyCmd.Wait()
 }
