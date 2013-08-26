@@ -22,24 +22,13 @@ TODO:
 
 * Clipboard watcher(?)
 
+## Commands:
 
-
-Commands:
-
-paste command,
+paste command:
 
     $ go get github.com/atotto/clipboard/cmd/gopaste
 
-like this:
-
-    $ gopaste > document.txt
-
-
-copy command, 
+copy command:
 
     $ go get github.com/atotto/clipboard/cmd/gocopy
-
-like this:
-
-    $ cat document.txt | gocopy
 
