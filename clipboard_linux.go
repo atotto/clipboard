@@ -15,22 +15,28 @@ var (
 	copyCmd  = exec.Command("xsel --input --clipboard")
 )
 
-func readAll() string {
+func readAll() (string, error) {
 	out, err := pasteCmd.Output()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(out)
+	return string(out), nil
 }
 
-func writeAll(str string) {
+func writeAll(text string) error {
 	in, err := copyCmd.StdinPipe()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	copyCmd.Start()
-	in.Write([]byte(str))
-	in.Close()
-	copyCmd.Wait()
+	if err := copyCmd.Start(); err != nil {
+		return err
+	}
+	if _, err := in.Write([]byte(text)); err != nil {
+		return err
+	}
+	if err := in.Close(); err != nil {
+		return err
+	}
+	return copyCmd.Wait()
 }
