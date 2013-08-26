@@ -27,11 +27,17 @@ TODO:
 
 ## Commands:
 
-paste command:
+paste shell command:
 
     $ go get github.com/atotto/clipboard/cmd/gopaste
+    $ # example:
+    $ gopaste > document.txt
 
-copy command:
+copy shell command:
 
     $ go get github.com/atotto/clipboard/cmd/gocopy
+    $ # example:
+    $ cat document.txt | gocopy
+
+
 
