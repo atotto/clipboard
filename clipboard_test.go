@@ -10,9 +10,17 @@ import (
 )
 
 func TestCopyAndPaste(t *testing.T) {
-	expected := "testtest"
-	WriteAll(expected)
-	actual := ReadAll()
+	expected := "日本語"
+
+	err := WriteAll(expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actual, err := ReadAll()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if actual != expected {
 		t.Errorf("want %s, got %s", expected, actual)

@@ -15,22 +15,28 @@ var (
 	pbcopyCmd  = exec.Command("pbcopy")
 )
 
-func readAll() string {
+func readAll() (string, error) {
 	out, err := pbpasteCmd.Output()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(out)
+	return string(out), nil
 }
 
-func writeAll(text string) {
+func writeAll(text string) error {
 	in, err := pbcopyCmd.StdinPipe()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	pbcopyCmd.Start()
-	in.Write([]byte(text))
-	in.Close()
-	pbcopyCmd.Wait()
+	if err := pbcopyCmd.Start(); err != nil {
+		return err
+	}
+	if _, err := in.Write([]byte(text)); err != nil {
+		return err
+	}
+	if err := in.Close(); err != nil {
+		return err
+	}
+	return pbcopyCmd.Wait()
 }

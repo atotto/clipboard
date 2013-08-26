@@ -9,7 +9,8 @@ import (
 func Example() {
 
 	clipboard.WriteAll("日本語")
-	fmt.Println(clipboard.ReadAll())
+	text, _ := clipboard.ReadAll()
+	fmt.Println(text)
 
 	// Output:
 	// 日本語

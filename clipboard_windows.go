@@ -7,7 +7,6 @@
 package clipboard
 
 import (
-	"log"
 	"syscall"
 	"unsafe"
 )
@@ -33,69 +32,70 @@ var (
 	lstrcpy      = kernel32.NewProc("lstrcpyW")
 )
 
-func readAll() string {
+func readAll() (string, error) {
 	r, _, err := openClipboard.Call(0)
 	if r == 0 {
-		log.Fatalf("OpenClipboard failed: %v", err)
+		return "", err
 	}
 	defer closeClipboard.Call()
 
 	h, _, err := getClipboardData.Call(cfUnicodetext)
 	if r == 0 {
-		log.Fatalf("GetClipboardData failed: %v", err)
+		return "", err
 	}
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
-		log.Fatalf("GlobalLock failed: %v", err)
+		return "", err
 	}
 
 	text := syscall.UTF16ToString((*[1 << 20]uint16)(unsafe.Pointer(l))[:])
 
 	r, _, err = globalUnlock.Call(h)
 	if r == 0 {
-		log.Fatalf("GlobalUnlock failed: %v", err)
+		return "", err
 	}
 
-	return text
+	return text, nil
 }
 
-func writeAll(text string) {
+func writeAll(text string) error {
 	r, _, err := openClipboard.Call(0)
 	if r == 0 {
-		log.Fatalf("OpenClipboard failed: %v", err)
+		return err
 	}
 	defer closeClipboard.Call()
 
 	r, _, err = emptyClipboard.Call(0)
 	if r == 0 {
-		log.Fatalf("EmptyClipboard failed: %v", err)
+		return err
 	}
 
 	data := syscall.StringToUTF16(text)
 
 	h, _, err := globalAlloc.Call(gmemFixed, uintptr(len(data)*int(unsafe.Sizeof(data))/8))
 	if h == 0 {
-		log.Fatalf("GlobalAlloc failed: %v", err)
+		return err
 	}
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
-		log.Fatalf("GlobalLock failed: %v", err)
+		return err
 	}
 
 	r, _, err = lstrcpy.Call(l, uintptr(unsafe.Pointer(&data[0])))
 	if r == 0 {
-		log.Fatalf("lstrcpy failed: %v", err)
+		return err
 	}
 
 	r, _, err = globalUnlock.Call(h)
 	if r == 0 {
-		log.Fatalf("GlobalUnlock failed: %v", err)
+		return err
 	}
 
 	r, _, err = setClipboardData.Call(cfUnicodetext, h)
 	if r == 0 {
-		log.Fatalf("SetClipboardData failed: %v", err)
+		return err
 	}
+	return nil
 }

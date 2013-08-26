@@ -14,5 +14,7 @@ func main() {
 		panic(err)
 	}
 
-	clipboard.WriteAll(string(out))
+	if err := clipboard.WriteAll(string(out)); err != nil {
+		panic(err)
+	}
 }
