@@ -10,10 +10,11 @@ Build:
 
     $ go get github.com/atotto/clipboard
 
-platform, works on:
+Platforms:
 
 * OSX
 * Windows 7 (probably work on other Windows)
+* Linux (requires 'xsel' command to be installed)
 
 
 Document: 
