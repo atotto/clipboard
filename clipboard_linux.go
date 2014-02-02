@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	pasteCmd = exec.Command("xsel --output --clipboard")
-	copyCmd  = exec.Command("xsel --input --clipboard")
+	pasteCmd = exec.Command("xsel", "--output", "--clipboard")
+	copyCmd  = exec.Command("xsel", "--input", "--clipboard")
 )
 
 func readAll() (string, error) {
