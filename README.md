@@ -28,7 +28,6 @@ Notes:
 
 TODO:
 
-* Linux support
 * BSD support
 * Clipboard watcher(?)
 
