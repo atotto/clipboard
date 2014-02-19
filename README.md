@@ -14,7 +14,7 @@ Platforms:
 
 * OSX
 * Windows 7 (probably work on other Windows)
-* Linux (requires 'xsel' command to be installed)
+* Linux (requires 'xsel' or 'xclip' command to be installed)
 
 
 Document: 
