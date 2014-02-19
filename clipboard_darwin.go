@@ -11,11 +11,20 @@ import (
 )
 
 var (
-	pasteCmd = exec.Command("pbpaste")
-	copyCmd  = exec.Command("pbcopy")
+	pasteCmdArgs = "pbpaste"
+	copyCmdArgs  = "pbcopy"
 )
 
+func getPasteCommand() *exec.Cmd {
+	return exec.Command(pasteCmdArgs)
+}
+
+func getCopyCommand() *exec.Cmd {
+	return exec.Command(copyCmdArgs)
+}
+
 func readAll() (string, error) {
+	pasteCmd := getPasteCommand()
 	out, err := pasteCmd.Output()
 	if err != nil {
 		return "", err
@@ -24,6 +33,7 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
+	copyCmd := getCopyCommand()
 	in, err := copyCmd.StdinPipe()
 	if err != nil {
 		return err
