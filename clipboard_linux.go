@@ -11,16 +11,15 @@ import (
 )
 
 var (
-	pasteCmdArgs 	[]string
-	copyCmdArgs		[]string
+	pasteCmdArgs []string
+	copyCmdArgs  []string
 
 	xselPaste = []string{"xsel", "--output", "--clipboard"}
-	xselCopy = []string{"xsel", "--input", "--clipboard"}
+	xselCopy  = []string{"xsel", "--input", "--clipboard"}
 
 	xclipPaste = []string{"xclip", "-out", "-secondary", "clipboard"}
-	xclipCopy = []string{"xclip", "-in", "-secondary", "clipboard"}
+	xclipCopy  = []string{"xclip", "-in", "-secondary", "clipboard"}
 )
-
 
 func init() {
 	_, err := exec.LookPath("xsel")
@@ -32,6 +31,7 @@ func init() {
 		}
 		pasteCmdArgs = xclipPaste
 		copyCmdArgs = xclipCopy
+		return
 	}
 	pasteCmdArgs = xselPaste
 	copyCmdArgs = xselCopy
@@ -44,7 +44,6 @@ func getPasteCommand() *exec.Cmd {
 func getCopyCommand() *exec.Cmd {
 	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
 }
-
 
 func readAll() (string, error) {
 	pasteCmd := getPasteCommand()
