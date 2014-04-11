@@ -23,18 +23,20 @@ var (
 
 func init() {
 	_, err := exec.LookPath("xsel")
-	if err != nil {
-		_, err = exec.LookPath("xclip")
-		if err != nil {
-			println("No clipboard utilities available. Please install xset or xclip.")
-			return
-		}
+	if err == nil {
+		pasteCmdArgs = xselPaste
+		copyCmdArgs = xselCopy
+		return
+	}
+
+	_, err = exec.LookPath("xclip")
+	if err == nil {
 		pasteCmdArgs = xclipPaste
 		copyCmdArgs = xclipCopy
 		return
 	}
-	pasteCmdArgs = xselPaste
-	copyCmdArgs = xselCopy
+
+	println("No clipboard utilities available. Please install xset or xclip.")
 }
 
 func getPasteCommand() *exec.Cmd {
