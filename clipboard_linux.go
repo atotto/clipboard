@@ -10,45 +10,42 @@ import (
 	"os/exec"
 )
 
+const (
+	xsel  = "xsel"
+	xclip = "xclip"
+)
+
 var (
-	pasteCmdArgs []string
-	copyCmdArgs  []string
+	pasteCmd, copyCmd *exec.Cmd
 
-	xselPaste = []string{"xsel", "--output", "--clipboard"}
-	xselCopy  = []string{"xsel", "--input", "--clipboard"}
+	xselPaste = exec.Command(xsel, "--output", "--clipboard")
+	xselCopy  = exec.Command(xsel, "--input", "--clipboard")
 
-	xclipPaste = []string{"xclip", "-out", "-secondary", "clipboard"}
-	xclipCopy  = []string{"xclip", "-in", "-secondary", "clipboard"}
+	xclipPaste = exec.Command(xclip, "-out", "-sel", "clipboard")
+	xclipCopy  = exec.Command(xclip, "-in", "-sel", "clipboard")
 )
 
 func init() {
-	_, err := exec.LookPath("xsel")
+	pasteCmd = xselPaste
+	copyCmd = xselCopy
+
+	_, err := exec.LookPath(xsel)
 	if err == nil {
-		pasteCmdArgs = xselPaste
-		copyCmdArgs = xselCopy
 		return
 	}
 
-	_, err = exec.LookPath("xclip")
+	pasteCmd = xclipPaste
+	copyCmd = xclipCopy
+
+	_, err = exec.LookPath(xclip)
 	if err == nil {
-		pasteCmdArgs = xclipPaste
-		copyCmdArgs = xclipCopy
 		return
 	}
 
 	println("No clipboard utilities available. Please install xset or xclip.")
 }
 
-func getPasteCommand() *exec.Cmd {
-	return exec.Command(pasteCmdArgs[0], pasteCmdArgs[1:]...)
-}
-
-func getCopyCommand() *exec.Cmd {
-	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
-}
-
 func readAll() (string, error) {
-	pasteCmd := getPasteCommand()
 	out, err := pasteCmd.Output()
 	if err != nil {
 		return "", err
@@ -57,7 +54,6 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
-	copyCmd := getCopyCommand()
 	in, err := copyCmd.StdinPipe()
 	if err != nil {
 		return err
