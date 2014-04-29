@@ -21,8 +21,8 @@ var (
 	xselPaste = exec.Command(xsel, "--output", "--clipboard")
 	xselCopy  = exec.Command(xsel, "--input", "--clipboard")
 
-	xclipPaste = exec.Command(xclip, "-out", "-sel", "clipboard")
-	xclipCopy  = exec.Command(xclip, "-in", "-sel", "clipboard")
+	xclipPaste = exec.Command(xclip, "-out", "-selection", "clipboard")
+	xclipCopy  = exec.Command(xclip, "-in", "-selection", "clipboard")
 )
 
 func init() {
