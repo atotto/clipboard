@@ -1,0 +1,10 @@
+language: go
+
+go:
+ - go1.2
+
+before_install:
+ - sudo apt-get install xclip
+
+script:
+ - go test -v ./...
