@@ -73,7 +73,7 @@ func writeAll(text string) error {
 
 	data := syscall.StringToUTF16(text)
 
-	h, _, err := globalAlloc.Call(gmemFixed, uintptr(len(data)*int(unsafe.Sizeof(data))/8))
+	h, _, err := globalAlloc.Call(gmemFixed, uintptr(len(data)*int(unsafe.Sizeof(data[0]))))
 	if h == 0 {
 		return err
 	}
