@@ -43,7 +43,7 @@ func init() {
 		return
 	}
 
-	println("No clipboard utilities available. Please install xset or xclip.")
+	println("No clipboard utilities available. Please install xsel or xclip.")
 }
 
 func getPasteCommand() *exec.Cmd {
