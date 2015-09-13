@@ -27,19 +27,17 @@ var (
 )
 
 func init() {
-	pasteCmdArgs = xselPasteArgs
-	copyCmdArgs = xselCopyArgs
-
-	_, err := exec.LookPath(xsel)
-	if err == nil {
-		return
-	}
-
 	pasteCmdArgs = xclipPasteArgs
 	copyCmdArgs = xclipCopyArgs
 
-	_, err = exec.LookPath(xclip)
-	if err == nil {
+	if _, err := exec.LookPath(xclip); err == nil {
+		return
+	}
+
+	pasteCmdArgs = xselPasteArgs
+	copyCmdArgs = xselCopyArgs
+
+	if _, err := exec.LookPath(xsel); err == nil {
 		return
 	}
 
