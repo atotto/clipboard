@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/atotto/clipboard"
-
 	"io/ioutil"
 	"os"
+
+	"github.com/atotto/clipboard"
 )
 
 func main() {

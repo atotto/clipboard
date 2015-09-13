@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/atotto/clipboard"
-
 	"fmt"
+
+	"github.com/atotto/clipboard"
 )
 
 func main() {
