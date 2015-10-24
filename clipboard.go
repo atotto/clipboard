@@ -16,3 +16,7 @@ func ReadAll() (string, error) {
 func WriteAll(text string) error {
 	return writeAll(text)
 }
+
+// Unsupported might be set true during clipboard init, to help callers decide
+// whether or not to offer clipboard options.
+var Unsupported bool
