@@ -94,6 +94,11 @@ func writeAll(text string) error {
 	if h == 0 {
 		return err
 	}
+	defer func() {
+		if h != 0 {
+			globalFree.Call(h)
+		}
+	}()
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
@@ -114,5 +119,6 @@ func writeAll(text string) error {
 	if r == 0 {
 		return err
 	}
+	h = 0 // suppress deferred cleanup
 	return nil
 }
