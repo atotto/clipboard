@@ -40,7 +40,7 @@ func readAll() (string, error) {
 	defer closeClipboard.Call()
 
 	h, _, err := getClipboardData.Call(cfUnicodetext)
-	if r == 0 {
+	if h == 0 {
 		return "", err
 	}
 
