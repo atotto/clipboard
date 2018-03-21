@@ -14,7 +14,7 @@ import (
 
 const (
 	cfUnicodetext = 13
-	gmemFixed     = 0x0000
+	gmemMoveable  = 0x0002
 )
 
 var (
@@ -90,7 +90,9 @@ func writeAll(text string) error {
 
 	data := syscall.StringToUTF16(text)
 
-	h, _, err := globalAlloc.Call(gmemFixed, uintptr(len(data)*int(unsafe.Sizeof(data[0]))))
+	// "If the hMem parameter identifies a memory object, the object must have
+	// been allocated using the function with the GMEM_MOVEABLE flag."
+	h, _, err := globalAlloc.Call(gmemMoveable, uintptr(len(data)*int(unsafe.Sizeof(data[0]))))
 	if h == 0 {
 		return err
 	}
@@ -112,7 +114,9 @@ func writeAll(text string) error {
 
 	r, _, err = globalUnlock.Call(h)
 	if r == 0 {
-		return err
+		if err.(syscall.Errno) != 0 {
+			return err
+		}
 	}
 
 	r, _, err = setClipboardData.Call(cfUnicodetext, h)
