@@ -8,6 +8,7 @@ package clipboard
 
 import (
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -32,9 +33,25 @@ var (
 	lstrcpy      = kernel32.NewProc("lstrcpyW")
 )
 
+// waitOpenClipboard opens the clipboard, waiting for up to a second to do so.
+func waitOpenClipboard() error {
+	started := time.Now()
+	limit := started.Add(time.Second)
+	var r uintptr
+	var err error
+	for time.Now().Before(limit) {
+		r, _, err = openClipboard.Call(0)
+		if r != 0 {
+			return nil
+		}
+		time.Sleep(time.Millisecond)
+	}
+	return err
+}
+
 func readAll() (string, error) {
-	r, _, err := openClipboard.Call(0)
-	if r == 0 {
+	err := waitOpenClipboard()
+	if err != nil {
 		return "", err
 	}
 	defer closeClipboard.Call()
@@ -51,7 +68,7 @@ func readAll() (string, error) {
 
 	text := syscall.UTF16ToString((*[1 << 20]uint16)(unsafe.Pointer(l))[:])
 
-	r, _, err = globalUnlock.Call(h)
+	r, _, err := globalUnlock.Call(h)
 	if r == 0 {
 		return "", err
 	}
@@ -60,13 +77,13 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
-	r, _, err := openClipboard.Call(0)
-	if r == 0 {
+	err := waitOpenClipboard()
+	if err != nil {
 		return err
 	}
 	defer closeClipboard.Call()
 
-	r, _, err = emptyClipboard.Call(0)
+	r, _, err := emptyClipboard.Call(0)
 	if r == 0 {
 		return err
 	}
