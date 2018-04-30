@@ -2,12 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package clipboard_test
+package clipboard
 
 import (
 	"testing"
-
-	. "github.com/atotto/clipboard"
 )
 
 func TestCopyAndPaste(t *testing.T) {
