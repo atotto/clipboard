@@ -9,7 +9,7 @@ import (
 )
 
 func TestCopyAndPaste(t *testing.T) {
-	expected := "日本語"
+	expected := "日本語\n"
 
 	err := WriteAll(expected)
 	if err != nil {

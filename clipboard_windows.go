@@ -33,7 +33,7 @@ var (
 	globalSize   = kernel32.NewProc("GlobalSize")
 	globalLock   = kernel32.NewProc("GlobalLock")
 	globalUnlock = kernel32.NewProc("GlobalUnlock")
-	strcpy       = kernel32.NewProc("lstrcpyA")
+	memcpy       = kernel32.NewProc("RtlCopyMemory")
 )
 
 // waitOpenClipboard opens the clipboard, waiting for up to a second to do so.
@@ -65,7 +65,11 @@ func readAllWithFormat(cf uintptr) (string, error) {
 
 	h, _, err := getClipboardData.Call(cf)
 	if h == 0 {
-		return "", err
+		if err != syscall.Errno(0) {
+			return "", err
+		}
+
+		return "", nil
 	}
 
 	size, _, err := globalSize.Call(h)
@@ -75,7 +79,6 @@ func readAllWithFormat(cf uintptr) (string, error) {
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
-		panic(err)
 		return "", err
 	}
 
@@ -83,7 +86,6 @@ func readAllWithFormat(cf uintptr) (string, error) {
 
 	r, _, err := globalUnlock.Call(h)
 	if r == 0 {
-		panic(err)
 		return "", err
 	}
 
@@ -105,7 +107,7 @@ func writeAllWithFormat(text string, cf uintptr) error {
 
 	// "If the hMem parameter identifies a memory object, the object must have
 	// been allocated using the function with the GMEM_MOVEABLE flag."
-	h, _, err := globalAlloc.Call(gmemMoveable, uintptr(len(data)*int(unsafe.Sizeof(data[0]))))
+	h, _, err := globalAlloc.Call(gmemMoveable, uintptr(len(data)))
 	if h == 0 {
 		return err
 	}
@@ -121,7 +123,7 @@ func writeAllWithFormat(text string, cf uintptr) error {
 		return err
 	}
 
-	r, _, err := strcpy.Call(l, uintptr(unsafe.Pointer(&data[0])))
+	r, _, err := memcpy.Call(l, uintptr(unsafe.Pointer(&data[0])), uintptr(len(data)))
 	if r == 0 {
 		return err
 	}
