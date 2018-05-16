@@ -4,8 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kiennq/clipboard"
-	"io/ioutil"
 	"os"
+	"encoding/json"
+	"io"
 )
 
 const (
@@ -48,20 +49,27 @@ func getHtmlClipboard() uintptr {
 
 func main() {
 	htmlVal := flag.String("html", "", "html format text")
-	text := flag.String("text", "", "normal text")
-	stdinAsHtml := flag.Bool("in-html", false, "using stdin as html")
+	textVal := flag.String("text", "", "normal text")
+	useStdin := flag.Bool("in", false, "using stdin as input, the input format is json {text:, htmlText:}")
 	doClear := flag.Bool("clear", true, "clear previous clipboard")
 
 	flag.Parse()
 
 	htmlText := *htmlVal
-	if *stdinAsHtml {
-		in, err := ioutil.ReadAll(os.Stdin)
-		if err != nil {
+	text := *textVal
+	if *useStdin {
+		type Message struct {
+			Text, HtmlText string
+		}
+
+		dec := json.NewDecoder(os.Stdin)
+		var m Message
+		if err := dec.Decode(&m); err != nil && err != io.EOF {
 			panic(err)
 		}
 
-		htmlText = string(in)
+		htmlText = m.HtmlText
+		text = m.Text
 	}
 
 	htmlBlock := getHtmlBlock(htmlText)
@@ -78,8 +86,8 @@ func main() {
 		}
 	}
 
-	if *text != "" {
-		if err := clipboard.WriteAllWithFormat(*text, cfText); err != nil {
+	if text != "" {
+		if err := clipboard.WriteAllWithFormat(text, cfText); err != nil {
 			panic(err)
 		}
 	}
