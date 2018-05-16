@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/kiennq/clipboard"
+	"io/ioutil"
+	"os"
 )
 
 const (
@@ -14,7 +16,7 @@ const (
 		"EndFragment:%010d\n"
 
 	HtmlHeader = "<html>\n<body>\n"
-	HtmlFooter = "\n</body>\n</html>\n"
+	HtmlFooter = "\n</body>\n</html>"
 )
 
 var (
@@ -45,22 +47,40 @@ func getHtmlClipboard() uintptr {
 }
 
 func main() {
-	htmlText := flag.String("html", "", "html format text")
-	text := flag.String("text", "", "text")
+	htmlVal := flag.String("html", "", "html format text")
+	text := flag.String("text", "", "normal text")
+	stdinAsHtml := flag.Bool("in-html", false, "using stdin as html")
+	doClear := flag.Bool("clear", true, "clear previous clipboard")
 
 	flag.Parse()
 
-	htmlBlock := getHtmlBlock(*htmlText)
+	htmlText := *htmlVal
+	if *stdinAsHtml {
+		in, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
 
-	if err := clipboard.ClearClipboard(); err != nil {
-		panic(err)
+		htmlText = string(in)
 	}
 
-	if err := clipboard.WriteAllWithFormat(htmlBlock, cfHtml); err != nil {
-		panic(err)
+	htmlBlock := getHtmlBlock(htmlText)
+
+	if *doClear {
+		if err := clipboard.ClearClipboard(); err != nil {
+			panic(err)
+		}
 	}
 
-	if err := clipboard.WriteAllWithFormat(*text, cfText); err != nil {
-		panic(err)
+	if htmlText != "" {
+		if err := clipboard.WriteAllWithFormat(htmlBlock, cfHtml); err != nil {
+			panic(err)
+		}
+	}
+
+	if *text != "" {
+		if err := clipboard.WriteAllWithFormat(*text, cfText); err != nil {
+			panic(err)
+		}
 	}
 }
