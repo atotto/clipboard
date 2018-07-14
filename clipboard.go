@@ -6,7 +6,6 @@
 package clipboard
 
 import (
-	"context"
 	"time"
 )
 
@@ -22,7 +21,7 @@ func WriteAll(text string) error {
 
 // Monitor starts monitoring the clipboard for changes. When
 // a change is detected, it is sent over the channel.
-func Monitor(ctx context.Context, interval time.Duration, changes chan<- string) error {
+func Monitor(interval time.Duration, stopCh <-chan struct{}, changes chan<- string) error {
 	defer close(changes)
 
 	currentValue, err := ReadAll()
@@ -32,7 +31,7 @@ func Monitor(ctx context.Context, interval time.Duration, changes chan<- string)
 
 	for {
 		select {
-		case <-ctx.Done():
+		case <-stopCh:
 			return nil
 		default:
 			newValue, _ := ReadAll()

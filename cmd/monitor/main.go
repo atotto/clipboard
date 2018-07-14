@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -10,14 +9,14 @@ import (
 
 func main() {
 	changes := make(chan string, 10)
-	ctx := context.Background()
+	stopCh := make(chan struct{})
 
-	go clipboard.Monitor(ctx, time.Second, changes)
+	go clipboard.Monitor(time.Second, stopCh, changes)
 
 	// Watch for changes
 	for {
 		select {
-		case <-ctx.Done():
+		case <-stopCh:
 			break
 		default:
 			change, ok := <-changes
