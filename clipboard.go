@@ -21,18 +21,15 @@ func WriteAll(text string) error {
 
 // Monitor starts monitoring the clipboard for changes. When
 // a change is detected, it is sent over the channel.
-func Monitor(interval time.Duration, stopCh <-chan struct{}, changes chan<- string) error {
+func Monitor(interval time.Duration, stopCh <-chan struct{}, changes chan<- string) {
 	defer close(changes)
 
-	currentValue, err := ReadAll()
-	if err != nil {
-		return err
-	}
+	currentValue, _ := ReadAll()
 
 	for {
 		select {
 		case <-stopCh:
-			return nil
+			return
 		default:
 			newValue, _ := ReadAll()
 			if newValue != currentValue {
