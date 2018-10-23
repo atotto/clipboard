@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/shivylp/clipboard"
+	"github.com/spy16/clipboard"
 )
 
 func main() {
