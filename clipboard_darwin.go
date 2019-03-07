@@ -32,6 +32,10 @@ func readAll() (string, error) {
 	return string(out), nil
 }
 
+func readAllWithFormat(_ uintptr) (string, error) {
+	return readAll()
+}
+
 func writeAll(text string) error {
 	copyCmd := getCopyCommand()
 	in, err := copyCmd.StdinPipe()
@@ -49,4 +53,16 @@ func writeAll(text string) error {
 		return err
 	}
 	return copyCmd.Wait()
+}
+
+func writeAllWithFormat(text string, _ uintptr) error {
+	return writeAll(text)
+}
+
+func clearClipboard() error {
+	return nil
+}
+
+func getClipboardFormat(_ string) (uintptr, error) {
+	return 0, nil
 }
