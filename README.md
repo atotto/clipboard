@@ -4,45 +4,40 @@
 
 # Clipboard for Go
 
-Provide copying and pasting to the Clipboard for Go.
+Provide functionality for copying from and pasting to the clipboard.
 
-Build:
+### Build
 
-    $ go get github.com/atotto/clipboard
+    $ go get -u github.com/atotto/clipboard
 
-Platforms:
+### Platforms
 
-* OSX
-* Windows 7 (probably work on other Windows)
-* Linux, Unix (requires 'xclip' or 'xsel' command to be installed)
+* macOS
+* Windows 7 (probably works on later editions too)
+* Linux, Unix (requires `xclip` and `xsel` to be installed (or `wlpaste` and `wlcopy`, for Wayland)
 
-
-Document: 
+### Documentation
 
 * http://godoc.org/github.com/atotto/clipboard
 
-Notes:
+### Notes
 
-* Text string only
-* UTF-8 text encoding only (no conversion)
+* For functions that takes or return a string, only UTF-8 is supported
 
-TODO:
+### TODO
 
-* Clipboard watcher(?)
+- [ ] Clipboard watcher(?)
 
-## Commands:
+## Commands
 
 paste shell command:
 
-    $ go get github.com/atotto/clipboard/cmd/gopaste
+    $ go get -u github.com/atotto/clipboard/cmd/gopaste
     $ # example:
     $ gopaste > document.txt
 
 copy shell command:
 
-    $ go get github.com/atotto/clipboard/cmd/gocopy
+    $ go get -u github.com/atotto/clipboard/cmd/gocopy
     $ # example:
     $ cat document.txt | gocopy
-
-
-
