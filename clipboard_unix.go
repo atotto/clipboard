@@ -15,8 +15,8 @@ import (
 const (
 	xsel               = "xsel"
 	xclip              = "xclip"
-	wlcopy = "wl-copy"
-	wlpaste = "wl-paste"
+	wlcopy             = "wl-copy"
+	wlpaste            = "wl-paste"
 	termuxClipboardGet = "termux-clipboard-get"
 	termuxClipboardSet = "termux-clipboard-set"
 )
@@ -34,18 +34,18 @@ var (
 	xclipCopyArgs  = []string{xclip, "-in", "-selection", "clipboard"}
 
 	wlpasteArgs = []string{wlpaste, "--no-newline"}
-	wlcopyArgs = []string{wlcopy}
+	wlcopyArgs  = []string{wlcopy}
 
 	termuxPasteArgs = []string{termuxClipboardGet}
 	termuxCopyArgs  = []string{termuxClipboardSet}
 
-	missingCommands = errors.New("No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.")
+	errMissingCommands = errors.New("No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.")
 )
 
 func init() {
 	if os.Getenv("WAYLAND_DISPLAY") != "" {
-		pasteCmdArgs = wlpasteArgs;
-		copyCmdArgs = wlcopyArgs;
+		pasteCmdArgs = wlpasteArgs
+		copyCmdArgs = wlcopyArgs
 
 		if _, err := exec.LookPath(wlcopy); err == nil {
 			if _, err := exec.LookPath(wlpaste); err == nil {
@@ -94,21 +94,29 @@ func getCopyCommand() *exec.Cmd {
 	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
 }
 
-func readAll() (string, error) {
+func readAllBytes() ([]byte, error) {
 	if Unsupported {
-		return "", missingCommands
+		return []byte{}, errMissingCommands
 	}
 	pasteCmd := getPasteCommand()
 	out, err := pasteCmd.Output()
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
-	return string(out), nil
+	return out, nil
 }
 
-func writeAll(text string) error {
+func readAll() (string, error) {
+	b, err := readAllBytes()
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func writeAllBytes(b []byte) error {
 	if Unsupported {
-		return missingCommands
+		return errMissingCommands
 	}
 	copyCmd := getCopyCommand()
 	in, err := copyCmd.StdinPipe()
@@ -119,11 +127,15 @@ func writeAll(text string) error {
 	if err := copyCmd.Start(); err != nil {
 		return err
 	}
-	if _, err := in.Write([]byte(text)); err != nil {
+	if _, err := in.Write(b); err != nil {
 		return err
 	}
 	if err := in.Close(); err != nil {
 		return err
 	}
 	return copyCmd.Wait()
+}
+
+func writeAll(text string) error {
+	return writeAllBytes([]byte(text))
 }
