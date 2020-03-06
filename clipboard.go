@@ -5,14 +5,24 @@
 // Package clipboard read/write on clipboard
 package clipboard
 
-// ReadAll read string from clipboard
+// ReadAll will read a string from the clipboard
 func ReadAll() (string, error) {
 	return readAll()
 }
 
-// WriteAll write string to clipboard
+// WriteAll will write a string to the clipboard
 func WriteAll(text string) error {
 	return writeAll(text)
+}
+
+// ReadAllBytes will read bytes from the clipboard
+func ReadAllBytes() ([]byte, error) {
+	return readAllBytes()
+}
+
+// WriteAllBytes will write bytes to the clipboard
+func WriteAllBytes(b []byte) error {
+	return writeAllBytes(b)
 }
 
 // Unsupported might be set true during clipboard init, to help callers decide
