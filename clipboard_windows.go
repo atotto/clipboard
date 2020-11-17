@@ -18,12 +18,13 @@ const (
 )
 
 var (
-	user32           = syscall.MustLoadDLL("user32")
-	openClipboard    = user32.MustFindProc("OpenClipboard")
-	closeClipboard   = user32.MustFindProc("CloseClipboard")
-	emptyClipboard   = user32.MustFindProc("EmptyClipboard")
-	getClipboardData = user32.MustFindProc("GetClipboardData")
-	setClipboardData = user32.MustFindProc("SetClipboardData")
+	user32                     = syscall.MustLoadDLL("user32")
+	isClipboardFormatAvailable = user32.MustFindProc("IsClipboardFormatAvailable")
+	openClipboard              = user32.MustFindProc("OpenClipboard")
+	closeClipboard             = user32.MustFindProc("CloseClipboard")
+	emptyClipboard             = user32.MustFindProc("EmptyClipboard")
+	getClipboardData           = user32.MustFindProc("GetClipboardData")
+	setClipboardData           = user32.MustFindProc("SetClipboardData")
 
 	kernel32     = syscall.NewLazyDLL("kernel32")
 	globalAlloc  = kernel32.NewProc("GlobalAlloc")
@@ -50,6 +51,9 @@ func waitOpenClipboard() error {
 }
 
 func readAll() (string, error) {
+	if formatAvailable, _, err := isClipboardFormatAvailable.Call(cfUnicodetext); formatAvailable == 0 {
+		return "", err
+	}
 	err := waitOpenClipboard()
 	if err != nil {
 		return "", err
