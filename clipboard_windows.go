@@ -63,15 +63,16 @@ func readAll() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer closeClipboard.Call()
 
 	h, _, err := getClipboardData.Call(cfUnicodetext)
 	if h == 0 {
+		_, _, _ = closeClipboard.Call()
 		return "", err
 	}
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
+		_, _, _ = closeClipboard.Call()
 		return "", err
 	}
 
@@ -79,21 +80,31 @@ func readAll() (string, error) {
 
 	r, _, err := globalUnlock.Call(h)
 	if r == 0 {
+		_, _, _ = closeClipboard.Call()
 		return "", err
 	}
 
+	closed, _, err := closeClipboard.Call()
+	if closed == 0 {
+		return "", err
+	}
 	return text, nil
 }
 
 func writeAll(text string) error {
+	// LockOSThread ensure that the whole method will keep executing on the same thread from begin to end (it actually locks the goroutine thread attribution).
+	// Otherwise if the goroutine switch thread during execution (which is a common practice), the OpenClipboard and CloseClipboard will happen on two different threads, and it will result in a clipboard deadlock.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	err := waitOpenClipboard()
 	if err != nil {
 		return err
 	}
-	defer closeClipboard.Call()
 
 	r, _, err := emptyClipboard.Call(0)
 	if r == 0 {
+		_, _, _ = closeClipboard.Call()
 		return err
 	}
 
@@ -103,6 +114,7 @@ func writeAll(text string) error {
 	// been allocated using the function with the GMEM_MOVEABLE flag."
 	h, _, err := globalAlloc.Call(gmemMoveable, uintptr(len(data)*int(unsafe.Sizeof(data[0]))))
 	if h == 0 {
+		_, _, _ = closeClipboard.Call()
 		return err
 	}
 	defer func() {
@@ -113,25 +125,33 @@ func writeAll(text string) error {
 
 	l, _, err := globalLock.Call(h)
 	if l == 0 {
+		_, _, _ = closeClipboard.Call()
 		return err
 	}
 
 	r, _, err = lstrcpy.Call(l, uintptr(unsafe.Pointer(&data[0])))
 	if r == 0 {
+		_, _, _ = closeClipboard.Call()
 		return err
 	}
 
 	r, _, err = globalUnlock.Call(h)
 	if r == 0 {
 		if err.(syscall.Errno) != 0 {
+			_, _, _ = closeClipboard.Call()
 			return err
 		}
 	}
 
 	r, _, err = setClipboardData.Call(cfUnicodetext, h)
 	if r == 0 {
+		_, _, _ = closeClipboard.Call()
 		return err
 	}
 	h = 0 // suppress deferred cleanup
+	closed, _, err := closeClipboard.Call()
+	if closed == 0 {
+		return err
+	}
 	return nil
 }
