@@ -9,9 +9,11 @@ go:
  - go1.9.4
  - go1.10
 
+services:
+ - xvfb
+
 before_install:
  - export DISPLAY=:99.0
- - sh -e /etc/init.d/xvfb start
 
 script:
  - sudo apt-get install xsel
