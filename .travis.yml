@@ -1,10 +1,11 @@
 language: go
 
+os:
+ - linux
+ - osx
+
 go:
- - go1.4.3
- - go1.11.x
  - go1.13.x
- - go1.15.x
  - go1.x
 
 services:
@@ -14,7 +15,7 @@ before_install:
  - export DISPLAY=:99.0
 
 script:
- - sudo apt-get install xsel
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install xsel; fi
  - go test -v .
- - sudo apt-get install xclip
+ - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install xclip; fi
  - go test -v .
