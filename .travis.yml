@@ -3,6 +3,7 @@ language: go
 os:
  - linux
  - osx
+ - windows
 
 go:
  - go1.13.x
