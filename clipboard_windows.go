@@ -7,6 +7,7 @@
 package clipboard
 
 import (
+	"errors"
 	"runtime"
 	"syscall"
 	"time"
@@ -56,8 +57,8 @@ func readAll() (string, error) {
 	// Otherwise if the goroutine switch thread during execution (which is a common practice), the OpenClipboard and CloseClipboard will happen on two different threads, and it will result in a clipboard deadlock.
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
-	if formatAvailable, _, err := isClipboardFormatAvailable.Call(cfUnicodetext); formatAvailable == 0 {
-		return "", err
+	if formatAvailable, _, _ := isClipboardFormatAvailable.Call(cfUnicodetext); formatAvailable == 0 {
+		return "", errors.New("clipboard format is unavailable")
 	}
 	err := waitOpenClipboard()
 	if err != nil {
