@@ -34,6 +34,8 @@ var (
 	globalLock   = kernel32.NewProc("GlobalLock")
 	globalUnlock = kernel32.NewProc("GlobalUnlock")
 	lstrcpy      = kernel32.NewProc("lstrcpyW")
+
+	ErrFormatUnavailable = errors.New("clipboard format is unavailable")
 )
 
 // waitOpenClipboard opens the clipboard, waiting for up to a second to do so.
@@ -58,7 +60,7 @@ func readAll() (string, error) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	if formatAvailable, _, _ := isClipboardFormatAvailable.Call(cfUnicodetext); formatAvailable == 0 {
-		return "", errors.New("clipboard format is unavailable")
+		return "", ErrFormatUnavailable
 	}
 	err := waitOpenClipboard()
 	if err != nil {
