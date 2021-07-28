@@ -60,6 +60,18 @@ func init() {
 		}
 	}
 
+	if os.Getenv("WSL_DISTRO_NAME") != "" {
+		pasteCmdArgs = powershellExePasteArgs
+		copyCmdArgs = clipExeCopyArgs
+		trimDos = true
+
+		if _, err := exec.LookPath(clipExe); err == nil {
+			if _, err := exec.LookPath(powershellExe); err == nil {
+				return
+			}
+		}
+	}
+
 	pasteCmdArgs = xclipPasteArgs
 	copyCmdArgs = xclipCopyArgs
 
@@ -79,16 +91,6 @@ func init() {
 
 	if _, err := exec.LookPath(termuxClipboardSet); err == nil {
 		if _, err := exec.LookPath(termuxClipboardGet); err == nil {
-			return
-		}
-	}
-
-	pasteCmdArgs = powershellExePasteArgs
-	copyCmdArgs = clipExeCopyArgs
-	trimDos = true
-
-	if _, err := exec.LookPath(clipExe); err == nil {
-		if _, err := exec.LookPath(powershellExe); err == nil {
 			return
 		}
 	}
