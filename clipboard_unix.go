@@ -43,17 +43,17 @@ var (
 	missingCommands = errors.New("No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.")
 )
 
-type CommandInfo struct {
-	trimDos bool
+type commandInfo struct {
+	trimDOS bool
 
 	pasteCmdArgs []string
 	copyCmdArgs  []string
 
-	Unsupported bool
+	unsupported bool
 }
 
-func findClipboardUtility() Commands {
-	c := CommandInfo{}
+func findClipboardUtility() commandInfo {
+	c := commandInfo{}
 
 	if os.Getenv("WAYLAND_DISPLAY") != "" {
 		c.pasteCmdArgs = wlpasteArgs
@@ -91,7 +91,7 @@ func findClipboardUtility() Commands {
 
 	c.pasteCmdArgs = powershellExePasteArgs
 	c.copyCmdArgs = clipExeCopyArgs
-	c.trimDos = true
+	c.trimDOS = true
 
 	if _, err := exec.LookPath(clipExe); err == nil {
 		if _, err := exec.LookPath(powershellExe); err == nil {
@@ -99,20 +99,20 @@ func findClipboardUtility() Commands {
 		}
 	}
 
-	return Command{Unsupported: true}
+	return commandInfo{unsupported: true}
 }
 
-func getPasteCommand(c CommandInfo) *exec.Cmd {
+func getPasteCommand(c commandInfo) *exec.Cmd {
 	return exec.Command(c.pasteCmdArgs[0], c.pasteCmdArgs[1:]...)
 }
 
-func getCopyCommand(c CommandInfo) *exec.Cmd {
+func getCopyCommand(c commandInfo) *exec.Cmd {
 	return exec.Command(c.copyCmdArgs[0], c.copyCmdArgs[1:]...)
 }
 
 func readAll() (string, error) {
 	c := findClipboardUtility()
-	if c.Unsupported {
+	if c.unsupported {
 		return "", missingCommands
 	}
 
@@ -122,7 +122,7 @@ func readAll() (string, error) {
 		return "", err
 	}
 	result := string(out)
-	if trimDos && len(result) > 1 {
+	if c.trimDOS && len(result) > 1 {
 		result = result[:len(result)-2]
 	}
 	return result, nil
@@ -130,11 +130,11 @@ func readAll() (string, error) {
 
 func writeAll(text string) error {
 	c := findClipboardUtility()
-	if c.Unsupported {
-		missingCommands
+	if c.unsupported {
+		return missingCommands
 	}
 
-	copyCmd := getCopyCommand()
+	copyCmd := getCopyCommand(c)
 	in, err := copyCmd.StdinPipe()
 	if err != nil {
 		return err
