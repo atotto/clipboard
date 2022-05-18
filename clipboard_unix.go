@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build freebsd || linux || netbsd || openbsd || solaris || dragonfly
 // +build freebsd linux netbsd openbsd solaris dragonfly
 
 package clipboard
@@ -24,12 +25,6 @@ const (
 )
 
 var (
-	Primary bool
-	trimDos bool
-
-	pasteCmdArgs []string
-	copyCmdArgs  []string
-
 	xselPasteArgs = []string{xsel, "--output", "--clipboard"}
 	xselCopyArgs  = []string{xsel, "--input", "--clipboard"}
 
@@ -48,73 +43,80 @@ var (
 	missingCommands = errors.New("No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.")
 )
 
-func init() {
+type CommandInfo struct {
+	trimDos bool
+
+	pasteCmdArgs []string
+	copyCmdArgs  []string
+
+	Unsupported bool
+}
+
+func findClipboardUtility() Commands {
+	c := CommandInfo{}
+
 	if os.Getenv("WAYLAND_DISPLAY") != "" {
-		pasteCmdArgs = wlpasteArgs
-		copyCmdArgs = wlcopyArgs
+		c.pasteCmdArgs = wlpasteArgs
+		c.copyCmdArgs = wlcopyArgs
 
 		if _, err := exec.LookPath(wlcopy); err == nil {
 			if _, err := exec.LookPath(wlpaste); err == nil {
-				return
+				return c
 			}
 		}
 	}
 
-	pasteCmdArgs = xclipPasteArgs
-	copyCmdArgs = xclipCopyArgs
+	c.pasteCmdArgs = xclipPasteArgs
+	c.copyCmdArgs = xclipCopyArgs
 
 	if _, err := exec.LookPath(xclip); err == nil {
-		return
+		return c
 	}
 
-	pasteCmdArgs = xselPasteArgs
-	copyCmdArgs = xselCopyArgs
+	c.pasteCmdArgs = xselPasteArgs
+	c.copyCmdArgs = xselCopyArgs
 
 	if _, err := exec.LookPath(xsel); err == nil {
-		return
+		return c
 	}
 
-	pasteCmdArgs = termuxPasteArgs
-	copyCmdArgs = termuxCopyArgs
+	c.pasteCmdArgs = termuxPasteArgs
+	c.copyCmdArgs = termuxCopyArgs
 
 	if _, err := exec.LookPath(termuxClipboardSet); err == nil {
 		if _, err := exec.LookPath(termuxClipboardGet); err == nil {
-			return
+			return c
 		}
 	}
 
-	pasteCmdArgs = powershellExePasteArgs
-	copyCmdArgs = clipExeCopyArgs
-	trimDos = true
+	c.pasteCmdArgs = powershellExePasteArgs
+	c.copyCmdArgs = clipExeCopyArgs
+	c.trimDos = true
 
 	if _, err := exec.LookPath(clipExe); err == nil {
 		if _, err := exec.LookPath(powershellExe); err == nil {
-			return
+			return c
 		}
 	}
 
-	Unsupported = true
+	return Command{Unsupported: true}
 }
 
-func getPasteCommand() *exec.Cmd {
-	if Primary {
-		pasteCmdArgs = pasteCmdArgs[:1]
-	}
-	return exec.Command(pasteCmdArgs[0], pasteCmdArgs[1:]...)
+func getPasteCommand(c CommandInfo) *exec.Cmd {
+	return exec.Command(c.pasteCmdArgs[0], c.pasteCmdArgs[1:]...)
 }
 
-func getCopyCommand() *exec.Cmd {
-	if Primary {
-		copyCmdArgs = copyCmdArgs[:1]
-	}
-	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
+func getCopyCommand(c CommandInfo) *exec.Cmd {
+	return exec.Command(c.copyCmdArgs[0], c.copyCmdArgs[1:]...)
 }
 
 func readAll() (string, error) {
-	if Unsupported {
+	c := findClipboardUtility()
+	if c.Unsupported {
 		return "", missingCommands
 	}
-	pasteCmd := getPasteCommand()
+
+	pasteCmd := getPasteCommand(c)
 	out, err := pasteCmd.Output()
 	if err != nil {
 		return "", err
@@ -127,9 +129,11 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
-	if Unsupported {
-		return missingCommands
+	c := findClipboardUtility()
+	if c.Unsupported {
+		missingCommands
 	}
+
 	copyCmd := getCopyCommand()
 	in, err := copyCmd.StdinPipe()
 	if err != nil {
