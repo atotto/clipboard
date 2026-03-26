@@ -34,13 +34,13 @@ TODO:
 
 paste shell command:
 
-    $ go get github.com/atotto/clipboard/cmd/gopaste
+    $ go install github.com/atotto/clipboard/cmd/gopaste@latest
     $ # example:
     $ gopaste > document.txt
 
 copy shell command:
 
-    $ go get github.com/atotto/clipboard/cmd/gocopy
+    $ go install github.com/atotto/clipboard/cmd/gocopy@latest
     $ # example:
     $ cat document.txt | gocopy
 
