@@ -4,7 +4,7 @@
 
 # Clipboard for Go
 
-Provide copying and pasting to the Clipboard for Go.
+Provide copying, pasting and monitoring clipboard functionality for Go.
 
 Build:
 
@@ -25,10 +25,6 @@ Notes:
 
 * Text string only
 * UTF-8 text encoding only (no conversion)
-
-TODO:
-
-* Clipboard watcher(?)
 
 ## Commands:
 
