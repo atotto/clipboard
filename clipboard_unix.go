@@ -97,17 +97,19 @@ func init() {
 }
 
 func getPasteCommand() *exec.Cmd {
+	nb := len(pasteCmdArgs)
 	if Primary {
-		pasteCmdArgs = pasteCmdArgs[:1]
+		nb = 2
 	}
-	return exec.Command(pasteCmdArgs[0], pasteCmdArgs[1:]...)
+	return exec.Command(pasteCmdArgs[0], pasteCmdArgs[1:nb]...)
 }
 
 func getCopyCommand() *exec.Cmd {
+	nb := len(copyCmdArgs)
 	if Primary {
-		copyCmdArgs = copyCmdArgs[:1]
+		nb = 2
 	}
-	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
+	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:nb]...)
 }
 
 func readAll() (string, error) {
