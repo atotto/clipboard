@@ -10,6 +10,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"sync"
 )
 
 const (
@@ -48,7 +49,15 @@ var (
 	missingCommands = errors.New("No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.")
 )
 
-func init() {
+var initOnce sync.Once
+
+func initCommands() {
+	initOnce.Do(func() {
+		detectCommands()
+	})
+}
+
+func detectCommands() {
 	if os.Getenv("WAYLAND_DISPLAY") != "" {
 		pasteCmdArgs = wlpasteArgs
 		copyCmdArgs = wlcopyArgs
@@ -111,6 +120,7 @@ func getCopyCommand() *exec.Cmd {
 }
 
 func readAll() (string, error) {
+	initCommands()
 	if Unsupported {
 		return "", missingCommands
 	}
@@ -127,6 +137,7 @@ func readAll() (string, error) {
 }
 
 func writeAll(text string) error {
+	initCommands()
 	if Unsupported {
 		return missingCommands
 	}
