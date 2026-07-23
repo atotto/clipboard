@@ -15,6 +15,13 @@ func WriteAll(text string) error {
 	return writeAll(text)
 }
 
+// Clear empties the clipboard without writing a placeholder value.
+// On Windows, writing an empty string via WriteAll can leave the clipboard
+// in a bad state for subsequent reads; Clear uses EmptyClipboard instead (#68).
+func Clear() error {
+	return clearAll()
+}
+
 // Unsupported might be set true during clipboard init, to help callers decide
 // whether or not to offer clipboard options.
 var Unsupported bool
