@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package clipboard
@@ -151,6 +152,23 @@ func writeAll(text string) error {
 	h = 0 // suppress deferred cleanup
 	closed, _, err := closeClipboard.Call()
 	if closed == 0 {
+		return err
+	}
+	return nil
+}
+
+func clearAll() error {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	err := waitOpenClipboard()
+	if err != nil {
+		return err
+	}
+
+	r, _, err := emptyClipboard.Call(0)
+	_, _, _ = closeClipboard.Call()
+	if r == 0 {
 		return err
 	}
 	return nil
