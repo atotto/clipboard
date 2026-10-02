@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/atotto/clipboard.svg?branch=master)](https://travis-ci.com/atotto/clipboard)
+[![test](https://github.com/atotto/clipboard/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/atotto/clipboard/actions/workflows/test.yml)
 
 [![GoDoc](https://godoc.org/github.com/atotto/clipboard?status.svg)](http://godoc.org/github.com/atotto/clipboard)
 
