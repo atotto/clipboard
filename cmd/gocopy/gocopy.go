@@ -29,10 +29,9 @@ func main() {
 			os.Exit(1)
 		}
 		if text == string(out) {
-			err = clipboard.WriteAll("")
+			if err := clipboard.WriteAll(""); err != nil {
+				os.Exit(1)
+			}
 		}
-	}
-	if err != nil {
-		os.Exit(1)
 	}
 }
