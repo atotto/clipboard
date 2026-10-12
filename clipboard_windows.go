@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -19,15 +21,15 @@ const (
 )
 
 var (
-	user32                     = syscall.MustLoadDLL("user32")
-	isClipboardFormatAvailable = user32.MustFindProc("IsClipboardFormatAvailable")
-	openClipboard              = user32.MustFindProc("OpenClipboard")
-	closeClipboard             = user32.MustFindProc("CloseClipboard")
-	emptyClipboard             = user32.MustFindProc("EmptyClipboard")
-	getClipboardData           = user32.MustFindProc("GetClipboardData")
-	setClipboardData           = user32.MustFindProc("SetClipboardData")
+	user32                     = windows.NewLazySystemDLL("user32.dll")
+	isClipboardFormatAvailable = user32.NewProc("IsClipboardFormatAvailable")
+	openClipboard              = user32.NewProc("OpenClipboard")
+	closeClipboard             = user32.NewProc("CloseClipboard")
+	emptyClipboard             = user32.NewProc("EmptyClipboard")
+	getClipboardData           = user32.NewProc("GetClipboardData")
+	setClipboardData           = user32.NewProc("SetClipboardData")
 
-	kernel32     = syscall.NewLazyDLL("kernel32")
+	kernel32     = windows.NewLazySystemDLL("kernel32")
 	globalAlloc  = kernel32.NewProc("GlobalAlloc")
 	globalFree   = kernel32.NewProc("GlobalFree")
 	globalLock   = kernel32.NewProc("GlobalLock")
