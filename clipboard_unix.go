@@ -24,7 +24,6 @@ const (
 )
 
 var (
-	Primary bool
 	trimDos bool
 
 	pasteCmdArgs []string

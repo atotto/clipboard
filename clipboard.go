@@ -18,3 +18,9 @@ func WriteAll(text string) error {
 // Unsupported might be set true during clipboard init, to help callers decide
 // whether or not to offer clipboard options.
 var Unsupported bool
+
+// Primary controls whether Unix selections use the X11 PRIMARY selection
+// instead of CLIPBOARD. On non-Unix platforms Primary has no effect but is
+// still defined so cross-compiled code can set it unconditionally.
+var Primary bool
+
