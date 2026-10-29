@@ -97,17 +97,11 @@ func init() {
 }
 
 func getPasteCommand() *exec.Cmd {
-	if Primary {
-		pasteCmdArgs = pasteCmdArgs[:1]
-	}
-	return exec.Command(pasteCmdArgs[0], pasteCmdArgs[1:]...)
+	return commandForSelection(pasteCmdArgs, Primary)
 }
 
 func getCopyCommand() *exec.Cmd {
-	if Primary {
-		copyCmdArgs = copyCmdArgs[:1]
-	}
-	return exec.Command(copyCmdArgs[0], copyCmdArgs[1:]...)
+	return commandForSelection(copyCmdArgs, Primary)
 }
 
 func readAll() (string, error) {
